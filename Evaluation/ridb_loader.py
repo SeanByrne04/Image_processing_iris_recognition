@@ -39,10 +39,11 @@ def fundus_mask(img, shrink=0.08):
 
 def disc_side(img):
     """Brightest point of a heavily blurred green channel ~ optic disc.
-    The fundus rim is masked out first, because camera glare at the edge
-    can be brighter than the disc (e.g. person 12, image 5)."""
-    g = cv2.GaussianBlur(img[:, :, 1], (0, 0), 25)
+    The fundus rim is masked out BEFORE blurring, because camera glare at
+    the edge can be brighter than the disc (e.g. person 12, image 5)."""
+    g = img[:, :, 1].copy()
     g[fundus_mask(img) == 0] = 0
+    g = cv2.GaussianBlur(g, (0, 0), 25)
     _, _, _, (x, _) = cv2.minMaxLoc(g)
     return "left" if x < img.shape[1] / 2 else "right"
 
