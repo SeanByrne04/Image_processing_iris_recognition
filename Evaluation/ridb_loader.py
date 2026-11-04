@@ -4,6 +4,7 @@ from collections import defaultdict
 from pathlib import Path
 
 import cv2
+import numpy as np
 import matplotlib.pyplot as plt
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -29,9 +30,19 @@ def load_ridb(folder=RIDB_DIR):
     return dict(data)
 
 
+def fundus_mask(img, shrink=0.08):
+    """Mask of the circular fundus area, shrunk inwards so rim glare is ignored."""
+    mask = (img[:, :, 2] > 20).astype(np.uint8)
+    k = max(3, int(img.shape[1] * shrink))
+    return cv2.erode(mask, np.ones((k, k), np.uint8))
+
+
 def disc_side(img):
-    """Brightest point of a heavily blurred green channel ~ optic disc."""
+    """Brightest point of a heavily blurred green channel ~ optic disc.
+    The fundus rim is masked out first, because camera glare at the edge
+    can be brighter than the disc (e.g. person 12, image 5)."""
     g = cv2.GaussianBlur(img[:, :, 1], (0, 0), 25)
+    g[fundus_mask(img) == 0] = 0
     _, _, _, (x, _) = cv2.minMaxLoc(g)
     return "left" if x < img.shape[1] / 2 else "right"
 
