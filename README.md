@@ -1,9 +1,9 @@
    ## Setup
-   pip install opencv-python numpy matplotlib
+   pip install opencv-contrib-python numpy matplotlib pillow
 
    ## Folders
    - Data/RIDB – 100 RIDB images (Akram et al., 2020)
-   - Preprocessing/: vessel segmentation
+   - Segmentation/ : vessel segmentation
    - Features/ : skeleton, bifurcations, matching
-   - Evaluation/ : loader, split, metrics, enrolment
+   - Evaluation/ : loader, split, metrics, enrolment, matching, pipeline (segmentation -> points -> template), segmentation_copy.py (importable copy of the Segmentation notebook)
    - Templates/ – saved enrolment templates
